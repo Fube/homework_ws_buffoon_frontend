@@ -1,0 +1,9 @@
+html, body, #root {
+
+  background-color: lightslategrey;
+}
+
+.nav-text {
+
+  color: aliceblue !important;
+}
