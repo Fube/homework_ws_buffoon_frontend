@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Container, Pagination, Table } from "react-bootstrap"
 import { useSelector } from "react-redux";
+import upsertRating from "../api/upsertRating";
 import getJokes from "../api/getJokes";
 import getUserInfo from "../api/getUserInfo";
 
@@ -50,6 +51,34 @@ const LandingPage = () => {
         .catch(console.log);
     }, [activePage]);
 
+    async function changeOpinion(guid) {
+
+        console.log('clicked', token);
+
+        const obj = ratings.get(guid);
+
+        if(obj === undefined) {
+
+            const rating = await upsertRating(true, guid, token);
+            ratings.set(rating.jokeGUID, rating);
+        }
+        else{
+
+            const { opinion } = obj;
+
+            obj.opinion = 
+                opinion === null? 
+                true:
+                opinion === false?
+                null:
+                false;
+            await upsertRating(obj.opinion, guid, token);
+        }
+
+        setRatings(new Map([...ratings])); // Force update
+        console.log(ratings)
+    }
+
     return (
         <div className="flex flex-col">
 
@@ -76,11 +105,18 @@ const LandingPage = () => {
                                         <td>{name}</td>
                                         {
                                             isLoggedIn?
-                                            <td>{
-                                                    ratings.get(guid) === undefined?
-                                                    'Neutral':
-                                                    ratings.get(guid).opinion === true && 'Positive' || 'Negative'
-                                                }</td>:
+                                            <td><div 
+                                                className="gg-heart w-1/12" 
+                                                style={{
+
+                                                    color:
+                                                    ratings.get(guid) === undefined || ratings.get(guid).opinion === null?
+                                                    'black':
+                                                    ratings.get(guid).opinion === true && 'lime' || 'red'
+                                                }}
+                                                onClick={() => changeOpinion(guid)}
+                                                />
+                                            </td>:
                                             ''
                                         }
                                     </tr>
