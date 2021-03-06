@@ -1,10 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Container, Pagination, Table } from "react-bootstrap"
+import { useSelector } from "react-redux";
 import getJokes from "../api/getJokes";
+import getUserInfo from "../api/getUserInfo";
 
 const LandingPage = () => {
 
+    const [ratings, setRatings] = useState(new Map());
+    const { isLoggedIn, token } = useSelector(s=>s);
     const [jokes, setJokes] = useState([]);
     const [activePage, setActivePage] = useState(1);
     const [totalPages, setTotalPages] = useState(33);
@@ -21,6 +25,20 @@ const LandingPage = () => {
 
         return result;
     }
+
+    useEffect(() => {
+
+        if(!isLoggedIn)return;
+
+        getUserInfo(token).then(({ ratings:rats }) => {
+
+            for(const rat of rats) {
+                ratings.set(rat.jokeGUID, rat);
+            }
+            setRatings(new Map([...ratings])); // Force update
+            console.log(ratings);
+        });
+    }, [ isLoggedIn ]);
 
     useEffect(() => {
 
@@ -42,15 +60,29 @@ const LandingPage = () => {
                             <th>Setup</th>
                             <th>Punchline</th>
                             <th>Category</th>
+                            {
+                                isLoggedIn?
+                                <th>Opinion</th>:
+                                ''
+                            }
                         </thead>
                         <tbody>
                             {
                             jokes.map(
-                                ({ setup, punchline, category: { name } }, key) => 
+                                ({ setup, punchline, category: { name }, guid }, key) => 
                                     <tr key={key}>
                                         <td>{setup}</td>
                                         <td>{punchline}</td>
                                         <td>{name}</td>
+                                        {
+                                            isLoggedIn?
+                                            <td>{
+                                                    ratings.get(guid) === undefined?
+                                                    'Neutral':
+                                                    ratings.get(guid).opinion === true && 'Positive' || 'Negative'
+                                                }</td>:
+                                            ''
+                                        }
                                     </tr>
                             )
                             }
