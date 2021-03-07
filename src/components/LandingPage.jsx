@@ -101,7 +101,7 @@ const LandingPage = () => {
                                 ({ setup, punchline, category: { name }, guid }, key) => 
                                     <tr key={key}>
                                         <td>{setup}</td>
-                                        <td>{punchline}</td>
+                                        <td><span className="punchline">{punchline}</span></td>
                                         <td>{name}</td>
                                         {
                                             isLoggedIn?

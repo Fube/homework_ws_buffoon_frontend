@@ -14,6 +14,7 @@ import {
   Link
 } from "react-router-dom";
 import Login from "./components/Login";
+import Signup from "./components/Signup";
 
 function App() {
 
@@ -44,6 +45,7 @@ function App() {
           <Navigation />
           <Switch>
             <Route path="/Login" component={Login} />
+            <Route path="/Signup" component={Signup} />
             <Route exact path="/" component={LandingPage} />
           </Switch>
       </Container>

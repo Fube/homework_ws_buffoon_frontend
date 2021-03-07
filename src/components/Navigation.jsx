@@ -1,15 +1,26 @@
 import { useEffect } from "react";
 import { Navbar, Nav, Image } from "react-bootstrap"
-import { useSelector } from "react-redux";
+import { useCookies } from "react-cookie";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from 'react-router-dom';
-import { login } from "../redux/actions";
+import { deleteToken, deleteUser, login, logout } from "../redux/actions";
 
 const Navigation = () => {
 
+    const dispatch = useDispatch();
     const { isLoggedIn, user } = useSelector(s=>s);
+    const [cookies, setCookie, removeCookie] = useCookies(['token']);
+    
+    async function logoutScenario() {
+
+        removeCookie('token');
+        dispatch(deleteUser());
+        dispatch(deleteToken());
+        dispatch(logout());
+    }
 
     return (
-        <Navbar expand="lg" style={{ backgroundColor: '#303538' }}>
+        <Navbar expand="lg">
             <Navbar.Brand>
                 <Link to="/">
                     <Image width="64" src="https://i.pinimg.com/originals/fb/32/06/fb320634f358a34f5099d8903af5c8c5.png"/>
@@ -21,10 +32,18 @@ const Navigation = () => {
                     {
                         (
                             isLoggedIn && user.username?
-                            <span className="nav-text">Welcome back {user.username}</span>:
+                            [
+                                <span className="nav-text p-2">Welcome back {user.username}</span>,
+                                <Nav.Link className="nav-text">
+                                    <Link to="/" onClick={() => logoutScenario()}>
+                                        Logout
+                                    </Link>
+                                 </Nav.Link>,
+                            ]
+                            :
                             [
                                 <Nav.Link className="nav-text">
-                                    <Link>
+                                    <Link to="/Signup">
                                         Signup
                                     </Link>
                                 </Nav.Link>,

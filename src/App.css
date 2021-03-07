@@ -1,9 +1,29 @@
 html, body, #root {
 
-  background-color: lightslategrey;
+  background-color: #c0b8b8;
 }
 
 .nav-text {
 
   color: aliceblue !important;
+}
+
+nav {
+  background-color: #363636;
+}
+
+* {
+  scrollbar-width: none;
+}
+
+.punchline {
+
+  color: grey;
+  background-color: grey;
+}
+
+.punchline:hover {
+
+  color: black;
+  background-color: unset;
 }

@@ -5,14 +5,17 @@ import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router";
 import signin from "../api/signin";
+import signup from "../api/signup";
 import { login, setToken, setUseraname } from "../redux/actions";
 
-const Login = () => {
+
+const Signup = () => {
 
     const { isLoggedIn, user } = useSelector(s=>s);
     const dispatch = useDispatch();
     const emailRef = useRef();
     const passwordRef = useRef();
+    const usernameRef = useRef();
     const [errorMessage, setErrorMessage] = useState('');
     const [cookies, setCookie] = useCookies(['token']);
 
@@ -24,9 +27,11 @@ const Login = () => {
 
         const { value: email } = emailRef.current;
         const { value: password } = passwordRef.current;
+        const { value: usernameValue } = usernameRef.current;
         
         try{
 
+            const { _id: id } = await signup({ email, password, username: usernameValue });
             const { token, username } = await signin({ email, password });
             dispatch(setToken({ token }));
             dispatch(setUseraname({ username }));
@@ -38,15 +43,16 @@ const Login = () => {
             
             if(axios.isAxiosError(e) && e.response) {
 
-                const { response: { status } } = e;
+                const { response: { status, data } } = e;
 
-                if(status === 404) {
-                    setErrorMessage("Email not found");
+                if(status === 400) {
+                    setErrorMessage(data);
                 }
-                else if(status) {
-                    setErrorMessage('Invalid password');
+                else {
+                    setErrorMessage("Server error...")    
                 }
 
+                console.log(e);
             }else {
                 console.log(e);
             }
@@ -59,6 +65,7 @@ const Login = () => {
         <div className="text-center flex justify-center mt-16">
             <Form className="w-1/6">
                 <p style={{ color: 'red' }}>{errorMessage.length?errorMessage:''}</p>
+                <Form.Control ref={usernameRef} className="mt-8" type="email" placeholder="Enter username" />
                 <Form.Control ref={emailRef} className="mt-8" type="email" placeholder="Enter email" />
                 <Form.Control ref={passwordRef} className="mt-8" type="password" placeholder="Password" />
                 <button  
@@ -70,6 +77,6 @@ const Login = () => {
             </Form>
         </div>
     );
-};
+}
 
-export default Login;
+export default Signup;
